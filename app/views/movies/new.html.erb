@@ -1,0 +1,59 @@
+<% @title = "New Movie - " %>
+<% provide(:title, @title) %>
+
+<% if @movie_search_results.present? %>
+  <%= render 'layouts/movie_suggestions_carousel' %>
+<% end %>
+
+<%= form_for(@movie, method: :post) do |f| %>
+  <%= f.label :movie_status_id %>
+  <%= f.collection_select :movie_status_id, MovieStatus.all, :id, :name, {}, {class: 'form-control'} %>
+
+  <%= f.label :title %>
+  <%= f.text_field :title, class: 'form-control' %>
+
+  <%= f.label :director %>
+  <%= f.text_field :director, class: 'form-control' %>
+
+  <%= f.label :release_date %>
+  <%= f.date_field :release_date, class: 'form-control' %>
+
+  <%= f.label :runtime %>
+  <%= f.text_field :runtime, class: 'form-control' %>
+
+  <%= f.label :writer %>
+  <%= f.text_field :writer, class: 'form-control' %>
+
+  <%= f.label :genre %>
+  <%= f.text_field :genre, class: 'form-control' %>
+
+  <%= f.label :mpaa_rating %>
+  <%= f.text_field :mpaa_rating, class: 'form-control' %>
+
+  <%= f.label :production_budget %>
+  <%= f.text_field :production_budget, class: 'form-control' %>
+
+  <%= f.label :description %>
+  <%= f.text_area :description, class: 'form-control' %>
+
+  <%= f.label :review %>
+  <div id="review_stars"></div>
+  <%= f.hidden_field :review %>
+
+  <br>
+  <%= f.submit( class: "btn btn-primary form-control") %>
+<% end %>
+
+<script>
+  $("#review_stars").rateYo({
+    starWidth: "30px",
+    halfStar: true,
+    rating: 0,
+    onInit: function(rating, rateYoInstance){
+      $("#movie_review").val(rating)
+    },
+    onSet: function (rating, rateYoInstance) {
+      $("#movie_review").val(rating)
+    }
+  });
+</script>

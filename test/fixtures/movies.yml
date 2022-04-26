@@ -1,0 +1,23 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  title: MyText
+  director: MyText
+  release_date: 2017-05-04
+  runtime: 1
+  writer: MyText
+  description: MyText
+  genre: MyText
+  review: MyText
+  movie_status: one
+
+two:
+  title: MyText
+  director: MyText
+  release_date: 2017-05-04
+  runtime: 1
+  writer: MyText
+  description: MyText
+  genre: MyText
+  review: MyText
+  movie_status: two

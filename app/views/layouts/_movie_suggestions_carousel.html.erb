@@ -1,0 +1,51 @@
+<div id="movie-suggestions-panel" class="panel panel-info">
+  <div class="panel-heading">
+    <h4 class="panel-title">
+      <a data-toggle="collapse" data-parent="#movie-suggestions-panel" href="#collapse">
+        Not the movie you were looking for? Click here to see more:
+      </a>
+    </h4><!-- panel title -->
+  </div><!-- panel-heading -->
+  <div id="collapse" class="panel-collapse collapse">
+    <div id="movie-suggestions-carousel">
+      <%= print_movie_suggestions_posters(@movie_search_results, @title) %>
+    </div><!-- movie-suggestions-carousel -->
+  </div><!-- collapse -->
+</div><!-- movie-suggestions-panel panel panel-default -->
+
+<script type="text/javascript">
+    var movie_suggestions_carousel = $('#movie-suggestions-carousel')
+    var tooltip_toggle = $('[data-toggle="tooltip"]');
+    var tooltip = $(".tooltip");
+
+    $(document).ready(function(){
+      tooltip_toggle.tooltip();
+
+      var number_of_slides = <%= @movie_search_results.count %>
+      var selected_slide = Math.floor(number_of_slides / 2);
+
+      movie_suggestions_carousel.slick({
+        slidesToShow: 3,
+        slidesToScroll: 1,
+        dots: true,
+        arrows: true,
+        centerMode: true,
+        variableWidth: true,
+        infinite: false,
+        initialSlide: selected_slide,
+      });
+    });
+
+    var movie_suggestions_panel = $("#movie-suggestions-panel");
+    
+    //Ensures that tooltips are disabled when the panel is hidden
+    movie_suggestions_panel.on("hide.bs.collapse", function() {
+      tooltip.remove();
+    });
+
+    $(document).on("turbolinks:before-cache", function() {
+  		if( movie_suggestions_carousel.slick("getSlick") ){
+	      movie_suggestions_carousel.slick("unslick");
+  		}
+  	});
+  </script>

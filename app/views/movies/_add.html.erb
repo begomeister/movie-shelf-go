@@ -1,0 +1,13 @@
+<%= form_tag( new_movie_path, method: "get", class: "form") do %>
+	<%= label_tag(:movie_query, "Movie Title", class: "control-label") %>
+	<%= text_field(:movie_query, :title, class: "form-control form-movie-title", id: "add-movietitle", autocomplete: :off) %>
+
+	<%= submit_tag("Add Movie", class: "btn btn-primary", id: "query-submit", name: nil) %>
+<% end %>
+
+<script>
+	$("#query-submit").click(function() {
+		$("#spinner").show();
+		$("#add-movie-modal").hide(200);
+	});
+</script>

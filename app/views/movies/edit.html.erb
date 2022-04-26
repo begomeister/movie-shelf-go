@@ -1,0 +1,81 @@
+<% @title = "Edit - " %>
+<% provide(:title, @title + @movie.title) %>
+
+<h1 class="text-center">Editing: <%= @movie.title %></h1>
+
+<% if @movie_search_results.present? %>
+  <%= render 'layouts/movie_suggestions_carousel' %>
+<% end %>
+
+<%= form_for(@movie) do |f| %>
+  <%= f.label :movie_status_id %>
+  <%= f.collection_select :movie_status_id, MovieStatus.all, :id, :name, {}, {class: 'form-control', id: 'movie-status-select'} %>
+
+  <%= f.label :title %>
+  <%= f.text_field :title, class: 'form-control' %>
+
+  <div class="btn btn-warning form-control" id="autofill-button">Autofill Movie Data</div>
+
+  <%= f.label :director %>
+  <%= f.text_field :director, class: 'form-control' %>
+
+  <%= f.label :release_date %>
+  <%= f.date_field :release_date, class: 'form-control' %>
+
+  <%= f.label :runtime %>
+  <%= f.text_field :runtime, class: 'form-control' %>
+
+  <%= f.label :writer %>
+  <%= f.text_field :writer, class: 'form-control' %>
+
+  <%= f.label :genre %>
+  <%= f.text_field :genre, class: 'form-control' %>
+
+  <%= f.label :mpaa_rating %>
+  <%= f.text_field :mpaa_rating, class: 'form-control' %>
+
+  <%= f.label :production_budget %>
+  <%= f.text_field :production_budget, class: 'form-control' %>
+
+  <%= f.label :description %>
+  <%= f.text_area :description, class: 'form-control' %>
+
+  <%= f.label :review %>
+  <div id="review_stars"></div>
+  <%= f.hidden_field :review %>
+  <br>
+
+  <%= f.submit "Update Movie", class: "btn btn-primary form-control" %>
+  <%= link_to "Cancel", @movie, class: "btn btn-default form-control", id: "cancel-edit-button" %>
+<% end %>
+<hr>
+<%= button_to "Delete Movie", @movie, :method => :delete, class: "btn btn-danger form-control", data: { confirm: "Are you sure you want to delete this movie?" } %>
+
+<script>
+  $("#review_stars").rateYo({
+    starWidth: "30px",
+    halfStar: true,
+    rating: <%= @movie.review ? @movie.review : 0 %>,
+    onSet: function (rating, rateYoInstance) {
+      $("#movie_review").val(rating)
+    }
+  });
+
+  $("#autofill-button").click(function() {
+    $("#spinner").show();
+    var movieTitle = $("#movie_title").val();
+    autofillMovie(null, movieTitle);
+  });
+
+  function autofillMovie(movieId, movieTitle = null){
+    if ( movieTitle != null ) {
+      var params = "title=" + movieTitle;
+    } else {
+      var params = "movie_id=" + movieId;
+    }
+
+    var link = "/movies/<%= @movie.id %>/edit?" + params;
+
+    window.location.href = link;
+  }
+</script>

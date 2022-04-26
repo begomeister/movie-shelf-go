@@ -1,0 +1,92 @@
+/*
+ * This is a manifest file that'll be compiled into application.css, which will include all the files
+ * listed below.
+ *
+ * Any CSS and SCSS file within this directory, lib/assets/stylesheets, vendor/assets/stylesheets,
+ * or any plugin's vendor/assets/stylesheets directory can be referenced here using a relative path.
+ *
+ * You're free to add application-wide styles to this file and they'll appear at the bottom of the
+ * compiled file so the styles you add here take precedence over styles defined in any other CSS/SCSS
+ * files in this directory. Styles in this file should be added after the last require_* statement.
+ * It is generally better to create a new file per style scope.
+ *
+ *= require_tree .
+ *= require_self
+ *= require select2
+ *= require select2-bootstrap
+ */
+
+// "bootstrap-sprockets" must be imported before "bootstrap" and "bootstrap/variables"
+@import "bootstrap-sprockets";
+@import "bootstrap";
+@import "datatables";
+@import "slick";
+@import "slick-theme";
+@import "introjs";
+//= require bootstrap/carousel
+
+
+// Universal Formatting Classes
+.auto-margin {
+  margin: auto;
+}
+
+// Load Widget
+#spinner {
+	display:    none;
+  position:   fixed;
+  z-index:    1000;
+  top:        0;
+  left:       0;
+  height:     100%;
+  width:      100%;
+  background: rgba( 255, 255, 255, .8 )
+              url(image-path('spinner.gif'))
+              50% 50%
+              no-repeat;
+  background-size: 150px;
+}
+
+/* FORMS */
+input, textarea, datearea, select, .uneditable-input {
+  border: 1px solid #bbb;
+  width: 100%;
+  margin-bottom: 15px;
+}
+
+label {
+  margin-top: 10px;
+}
+
+/* Make Select2 boxes match Bootstrap3 heights: */
+.select2-container--default .select2-selection--multiple .select2-selection__rendered {
+  line-height: 21px !important;
+}
+
+.select2-selection {
+  min-height: 34px !important;
+}
+
+/* Slick arrow colors */
+.slick-prev:before {
+  color: gray !important;
+}
+
+.slick-next:before {
+  color: gray !important;
+}
+
+/* Help button */
+#help-button {
+  float: right;
+}
+
+#help-button-div {
+  padding-top: 15px;
+  padding-bottom: 20px;
+}
+
+/* introJS formatting */
+.introjs-helperNumberLayer {
+  line-height: 12px;
+}

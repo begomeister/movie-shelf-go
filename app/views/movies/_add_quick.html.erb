@@ -1,0 +1,54 @@
+<div id="quick-add-alerts"></div>
+
+<%= form_for :movie, url: '#', html: {id: "add-quick-movie"} do |form| %>
+  <%= form.label(:title, "Movie Title", class: "control-label") %>
+  <%= form.text_field(:title, class: "form-control form-movie-title", id: "add-quick-movietitle",  autocomplete: :off) %>
+
+  <%= form.submit(id: "add-quick-submit", class: "btn btn-primary form-control", value: "Quick Add Movie") %>
+<% end %>
+
+<!-- TODO: AUTOFOCUS on Text field -->
+<script>
+  $("#add-quick-movie").submit( function( event ) {
+    event.preventDefault();
+    quickSubmitMovie();
+  });
+
+  function quickSubmitMovie(){
+    var movie_title = $('#add-quick-movietitle').val();
+    clearAlerts();
+
+    $.post( "/movies/add_quick",  {movie: { title: movie_title} } )
+    .success(function( data ) {
+      addSuccessMessage(data);
+    }).fail(function( data ) {
+      addFailureMessage(data);
+    });
+
+    //Refresh the form and focus on the text field again
+    $("#add-quick-movietitle").val("");
+    $("#add-quick-submit").removeAttr('data-disable-with');
+  }
+
+  function addSuccessMessage(data){
+    var message = `
+      <div class="alert alert-success alert-dismissible" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true"\\>&times;</span></button>`
+        + data.message +
+        `</div>`;
+    $("#quick-add-alerts").append(message);
+  }
+
+  function addFailureMessage(data){
+    var message = `
+      <div class="alert alert-danger alert-dismissible" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true"\\>&times;</span></button>`
+        + data.responseJSON.errors +
+        `</div>`;
+    $("#quick-add-alerts").append(message);
+  }
+
+  function clearAlerts(){
+    $(".alert-dismissible").remove();
+  }
+</script>

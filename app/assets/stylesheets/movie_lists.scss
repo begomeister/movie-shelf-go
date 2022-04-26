@@ -1,0 +1,45 @@
+// Place all the styles related to the MovieLists controller here.
+// They will automatically be included in application.css.
+// You can use Sass (SCSS) here: http://sass-lang.com/
+
+#shelf-delete-button {
+	float: right;
+	margin-right: 15px;
+	margin-left: 15px;
+	min-width: 110px;
+}
+
+#view-movie-button {
+	float: right;
+  width: 30%;
+	min-width: 45px;
+  padding: 2px;
+  margin-top: -2px;
+}
+
+#movie-add-button {
+	margin-bottom: 10px;
+}
+
+#remove-movie-button {
+	float: right;
+	color: red;
+	padding: 3px;
+}
+
+#remove-movie-button:hover {
+	cursor: pointer;
+}
+
+.movie-row {
+	margin-top: 10px;
+	margin-bottom: 10px;
+	padding-top: 5px;
+	padding-bottom: 4px;
+	border: #cdcdcd thin solid;
+  border-radius: 5px;
+}
+
+#shelf-select-row {
+	display: inline-flex;
+}

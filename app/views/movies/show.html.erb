@@ -1,0 +1,68 @@
+<% provide(:title, @movie.title) %>
+
+<div class="container">
+  <div id="movie-title" class="text-center">
+    <h1 ><%= @movie.title %></h1>
+    <div id="movie-status"></div>
+    <% image_tag("poster.png", size: "250x350", alt: "WIP Movie Poster", class: "hidden") %>
+    <div id="movie-rating"></div>
+    <div id="movie-description"><%= @movie.description %></div>
+  </div>
+
+  <div id="movie-buttons">
+    <%= link_to "Edit Movie", {controller: "movies", action: "edit", id: @movie.id}, class: "btn btn-primary" %>
+    <%= link_to "Delete Movie", @movie, method: :delete, data: { confirm: "Are you sure you want to delete this movie?" }, class: "btn btn-danger" %>
+  </div>
+
+
+  <table id="basic-movie-information-table" class="table table-bordered">
+    <thead>
+      <tr>
+        <th colspan="2" class="text-center">Basic Movie Information</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="td-category col-md-3 text-right"><strong>Director</strong></td>
+        <td class="td-value"><%= @movie.director %></td>
+      </tr>
+      <tr>
+        <td class="td-category col-md-3 text-right"><strong>Release Date</strong></td>
+        <td class="td-value"><%= @movie.release_date %></td>
+      </tr>
+      <tr>
+        <td class="td-category col-md-3 text-right"><strong>Runtime</strong></td>
+        <td class="td-value"><%= @movie.runtime %></td>
+      </tr>
+      <tr>
+        <td class="td-category col-md-3 text-right"><strong>Writer</strong></td>
+        <td class="td-value"><%= @movie.writer %></td>
+      </tr>
+      <tr>
+        <td class="td-category col-md-3 text-right"><strong>Genre</strong></td>
+        <td class="td-value"><%= @movie.genre %></td>
+      </tr>
+      <tr>
+        <td class="td-category col-md-3 text-right"><strong>MPAA Rating</strong></td>
+        <td class="td-value"><%= @movie.mpaa_rating %></td>
+      </tr>
+      <tr>
+        <td class="td-category col-md-3 text-right"><strong>Production Budget</strong></td>
+        <td class="td-value"><%= @movie.production_budget %></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+<script>
+  $("#movie-rating").rateYo({
+    starWidth: "30px",
+    halfStar: true,
+    readOnly: true,
+    rating: <%= @movie.review ? @movie.review : 0 %>
+  });
+
+  $(function() {
+    $("#movie-status").html(generateMovieStatusButton(<%= @movie.id %>, "<%= @movie.movie_status.name %>"))
+  });
+</script>

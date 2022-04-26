@@ -1,0 +1,98 @@
+// Place all the styles related to the Movies controller here.
+// They will automatically be included in application.css.
+// You can use Sass (SCSS) here: http://sass-lang.com/
+
+.quick-add-panel {
+  width: 500px;
+  margin: auto;
+}
+
+.quick-add-button {
+  width: 100%;
+  margin-top: 20px;
+}
+
+.movie-title:hover {
+  cursor: pointer;
+}
+
+.movie-status-button {
+  width: 90px
+}
+
+.movie-status-cell {
+  text-align: center;
+}
+
+.movie-suggestion-link {
+  font-style: italic;
+}
+
+.hover-pointer {
+  cursor: pointer;
+}
+
+.movie-poster {
+  width: 200px;
+  height: 300px;
+  padding: 10px;
+}
+
+.movie-poster:hover {
+  cursor: pointer;
+}
+
+.collapse.in {
+  padding-bottom: 15px;
+}
+
+/* MOVIE SUGGESTIONS CAROUSEL */
+#movie-suggestions-carousel {
+  width: 90% !important;
+  margin-top: auto;
+  margin-left: auto;
+  margin-right: auto;
+  //margin-bottom: 15px;
+}
+
+/* MOVIE SHOW */
+#movie-buttons {
+  margin-top: 20px;
+  margin-left: 12.5%;
+}
+
+#movie-rating {
+  margin: auto;
+  padding-top: 10px;
+}
+
+#movie-description {
+  margin-top: 15px;
+  min-width: 400px;
+  max-width: 75%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+#movie-status {
+  font-size: 16px;
+  color: #777777;
+}
+
+#new-movie-button {
+  float: right;
+  margin-top: -6px;
+}
+
+#basic-movie-information-table {
+  margin-top: 15px;
+  min-width: 400px;
+  max-width: 75%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* MOVIE EDIT */
+#cancel-edit-button {
+  margin-top: 10px;
+}

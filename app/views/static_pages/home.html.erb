@@ -1,0 +1,127 @@
+<% provide(:title, "Home") %>
+
+  <div class="jumbotron">
+	  <h2>Movie Shelf Go!</h2>
+	  <p> Movies Database. Keep track of your movies, which ones you want to see, which ones you don't. Whatever! They're here for your perusal. Powered by Ruby on Rails.</p><br>
+
+	  <% unless logged_in? %>
+	  	<p>Sign up Log in to get started, or see About for more information!</p>
+	  	<%= link_to "Sign up", sign_up_path, class: "btn btn-success" %>
+      <%= link_to "Log in", login_path, class: "btn btn-primary" %>
+    <% else %>
+      <div id="help-button-div">
+        <a id="help-button" class="btn btn-info">Help?</a>
+      </div>
+
+      <script>
+        var help_button = $("#help-button");
+
+        help_button.on("click", function() {
+          launch_tutorial();
+        })
+
+        function launch_tutorial(){
+          introJs().start();
+        }
+      </script>
+		<% end %>
+	</div>
+
+  <% if logged_in? %>
+    <!-- View Shelf button -->
+		<%= link_to movies_path, { class: "btn btn-lg btn-success home-links shelf-link", data: { intro: "View all movies and shelves." } } do %>
+			<span class='glyphicon glyphicon-film'></span> My Movies and Shelves
+		<% end %>
+
+    <!-- Add movie button -->
+    <div onclick="toggleModal('add-movie')" class="btn btn-lg btn-info home-links" data-intro="Add a movie by searching for data on it and autofilling the appropriate fields.">
+      <span class='glyphicon glyphicon-play'></span> Add Movie
+    </div>
+
+    <!-- Quick add movie button -->
+    <div onclick="toggleModal('add-quick')" class="btn btn-lg btn-primary home-links" data-intro="Add a movie quickly by skipping the autofill part. Generates the movie with just the title and a \"Pending Edit\" status.">
+      <span class='glyphicon glyphicon-fast-forward'></span> Quick Add Movie
+    </div>
+
+    <!-- Generic modal -->
+    <div class="modal fade" id="add-movie-modal" tabindex="-1" role="dialog" aria-labelledby="movie-modal-title">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title text-center" id="modal-title">Search & Add Movie</h4>
+          </div>
+          <div class="modal-body text-center">
+            <div id='add-movie' hidden>
+              <%= render 'movies/add' %>
+            </div>
+            <div id='add-quick' hidden>
+              <%= render 'movies/add_quick' %>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      //When the add movie modal is toggled
+      function toggleModal(modalView){
+        if(modalView == "add-quick"){
+          $("#modal-title").text("Quick Add Movie");
+          $("#add-quick").show();
+        } else if(modalView == "add-movie") {
+          $("#modal-title").text("Add Movie");
+          $("#add-movie").show();
+        }
+
+        $("#add-movie-modal").modal('toggle');
+      }
+
+      // When the modal is hidden, remove field values, modal title, and hide both forms
+      $("#add-movie-modal").on("hide.bs.modal", function(){
+        $("#add-movie").hide();
+        $("#add-quick").hide();
+        $(".form-movie-title").val("");
+      });
+
+      // When the modal is displayed, ensures there's focus on fields
+      $("#add-movie-modal").on("show.bs.modal", function(){
+        setTimeout( function() {
+          if( $("#add-quick").css("display") != "none" ){
+            $("#add-quick-movietitle").focus();
+          } else if ( $("#add-movie").css("display") != "none" ){
+            $("#add-movietitle").focus();
+          }}, 600);
+      });
+    </script>
+
+    <!-- Runs if signed up and logged in for first time -->
+    <% if session[:signed_up] %>
+      <% session[:signed_up] = false %>
+      <div id="tutorial-modal" class="modal fade" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h4>Welcome!</h4>
+            </div>
+            <div class="modal-body">
+              <p>Looks like you just signed up for the Movie Shelf!</p>
+              <p>This website should let you add Movies and Shelves for those movies to keep track of!</p>
+              <p>I added this tutorial to and welcome message to help you maneuver through this website. If you ever need to see the tutorial again just look for the Help button! They will appear over the website as you explore it.</p>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default" data-dismiss="modal">No tutorial, but thanks!</button>
+              <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="launch_tutorial()">Show me the tutorial!</button>
+            </div>
+          </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+      </div><!-- /.modal -->
+
+
+      <script>
+        $(document).ready(function() {
+          $("#tutorial-modal").modal('show');
+        });
+      </script>
+    <% end %>
+  <% end %>

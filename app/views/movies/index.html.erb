@@ -1,0 +1,120 @@
+<% provide(:title, "Movies") %>
+
+<div class="text-center">
+	<h2>My Movies</h2>
+	<em>Select a shelf to see all movies belonging to that shelf. The "default" shelf lists all movies</em>
+</div>
+
+<h3>Shelf:</h3>
+<%= collection_select :MovieList, :id, @current_user.movie_lists.all, :id, :name, {}, {id: 'movie-list-select', class: 'form-control'} %>
+
+<hr>
+
+<table id="movieTable" class="table table-bordered table-hover table-striped">
+	<thead>
+		<tr>
+			<th>Title</th>
+			<th>Director</th>
+			<th>Release Date</th>
+			<th>Runtime</th>
+			<th>Writer</th>
+			<th>Genre</th>
+			<th>Status</th>
+		</tr>
+	</thead>
+	<tbody>
+	</tbody>
+</table>
+
+<!-- Modal -->
+<div class="modal fade" id="movie-modal" tabindex="-1" role="dialog" aria-labelledby="movie-modal-title">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title text-center" id="movie-modal-title"></h4>
+      </div>
+      <div class="modal-body text-center">
+      	<% image_tag("poster.png", size: "250x350", alt: "WIP Movie Poster", class: "hidden") %>
+        <div id="movie-modal-review" class="auto-margin"></div>
+      	<div id="movie-modal-description" class="text-center"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" style="float: left" id="movie-modal-view">View Movie</button>
+        <button type="button" class="btn btn-info" style="float: left" id="movie-modal-edit">Edit Movie</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+	var movie_table = $('#movieTable');
+	var movie_list_select = $("#movie-list-select");
+
+	$(document).on("turbolinks:before-cache", function() {
+		if( movie_list_select.data('select2')){
+			movie_list_select.select2('destroy');
+		}
+		movie_table.DataTable().destroy();
+	});
+
+	$(function() {
+		movie_table.dataTable({
+			responsive: true,
+			"autoWidth": true,
+			readOnly: true,
+			"dom": "lfiprt",
+			"columnDefs": [
+				{ className: "movie-status-cell", "targets": [ 6 ] }
+			]
+		});
+
+		$("#movie-modal-review").rateYo({
+			starWidth: "20px",
+			rating: 0,
+			readOnly: true
+		});
+
+		$("#movie-list-select").select2({
+			theme: "bootstrap"
+		});
+
+		$("#movie-list-select").on('select2:select', function(){
+			var list_id = $("#movie-list-select").val();
+			get_list_data(list_id);
+		});
+
+		get_list_data(<%= current_user.movie_lists.first.id %>);
+	});
+
+	//Gets the movies belonging to the shelf and populates the table
+	function get_list_data(list_id){
+		$("#spinner").show();
+		$.get( '/movie_lists/' + list_id + '/movies', function( data ) {
+			populate_table(data);
+		}).always(function () {
+			$("#spinner").hide();
+		});
+	}
+
+	//Populates the table based on the given json object
+	function populate_table(movie_json){
+		movie_table.DataTable().clear().draw();
+
+		$.each(movie_json, function(index, item) {
+			var movie_link = '<a class="movie-title" onclick="displayModal('+item.id+')">'+item.title+'</a>';
+			var movie_status = generateMovieStatusButton(item.id, item.movie_status.name)
+
+			var tableRows = movie_table.DataTable().row.add( [
+				movie_link,
+				item.director,
+				item.release_date,
+				item.runtime,
+				item.writer,
+				item.genre,
+				movie_status
+			]).draw();
+		});
+	}
+</script>

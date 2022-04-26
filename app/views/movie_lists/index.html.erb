@@ -1,0 +1,361 @@
+<% provide(:title, "Manage Shelves") %>
+
+<h1 class="text-center">Manage Shelves</h1>
+
+<div class="row">
+	<div class="col-md-6" data-intro="In this panel you can select a shelf. Selecting a displays the movies in shelf panel where you can add or remove shelves from the selected shelf. A selected shelf can also be deleted from this panel">
+		<div class="panel panel-default shelf-panels ">
+			<div class="panel-heading text-center">Shelves</div>
+			<div class="panel-body">
+				<div class="row">
+					<div id="select-alert" class="col-md-12"></div>
+				</div>
+				<div id="shelf-select-row" class="row col-md-12">
+		    	<select id="shelf-list" class="form-control" style="margin-left: 15px;">
+		    		<option></option>
+		    	</select>
+					<button class="btn btn-danger disabled col-md-2" id="shelf-delete-button">Delete Shelf</button>
+				</div><!-- .row col-md-12 -->
+			</div><!-- .panel-body -->
+		</div><!-- .panel-default -->
+	</div><!-- .col-md-6 -->
+
+	<div class="col-md-6" data-intro="Add new shelves in this panel.">
+		<div class="panel panel-default shelf-panels">
+			<div class="panel-heading text-center">Add New Shelves</div>
+			<div class="panel-body">
+				<div id="add-shelf-alert"></div>
+		  	<div class="input-group">
+		    	<input type="text" class="form-control" placeholder="Shelf Name" id="new-shelf-name">
+		    	<span class="input-group-btn">
+		      	<button class="btn btn-primary" onclick="add_shelf()" type="button">Add</button>
+		    	</span>
+		  	</div><!-- /input-group -->
+			</div><!-- .panel-body -->
+		</div><!-- panel-default -->
+	</div><!-- .col-md-6 -->
+
+</div><!-- .row -->
+
+<div id="movies-in-shelf-panel" class="row" style="display: none">
+	<div class="col-md-12">
+		<div class="panel panel-default shelf-panels">
+			<div class="panel-heading text-center">Movies in Shelf</div>
+		  <div class="panel-body">
+				<div id="movies-alert"></div>
+				<button class="btn btn-primary disabled form-control" id="movie-add-button">Add Movie to Shelf</button>
+				<hr>
+				<div id="shelf-movies" class="container-fluid"></div>
+		  </div>
+		</div>
+	</div>
+</div>
+
+<!-- MOVIES -->
+<div class="modal fade" id="shelf-modal" tabindex="-1" role="dialog" aria-labelledby="movie-modal-title">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+				<h4 class="modal-title text-center" id="shelf-modal-title"></h4>
+			</div>
+			<div class="modal-body text-center">
+				<select id="shelf-modal-movie-multiple" class="form-control" multiple="multiple" style="width: 100% !important"></select>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+				<button type="button" class="btn btn-info disabled" style="float: left" id="shelf-modal-add">Add Movie(s) to Shelf</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div id="help-button-div">
+	<a id="help-button" class="btn btn-info">Help?</a>
+</div>
+
+<script>
+//TODO: Get js script to work from external file
+
+var shelf_list = $("#shelf-list");
+var shelf_movies = $("#shelf-movies");
+var movie_add_button = $("#movie-add-button");
+var shelf_delete_button = $("#shelf-delete-button");
+var shelf_modal_movie_multiple = $("#shelf-modal-movie-multiple");
+var movies_in_shelf_panel = $("#movies-in-shelf-panel");
+
+// SHELF LIST FUNCTIONS //
+	$(function () {
+		shelf_list.select2({
+			theme: "bootstrap"
+		}).on('select2:select', function(evt) {
+			get_shelf_movies(shelf_list.val());
+			movie_add_button.removeClass("disabled");
+			shelf_delete_button.removeClass("disabled");
+			movies_in_shelf_panel.show(300);
+			toggle_shelf_modal_tutorial(true);
+		});
+
+		//Pressing enter while writing a new shelf name will submit it
+		$("#new-shelf-name").keyup(function(event){
+			if(event.keyCode == 13){
+				add_shelf();
+			}
+		})
+
+		shelf_delete_button.click(function (){
+			if(!$(this).hasClass('disabled')){
+				var confirmation = confirm(`Are you sure you want to delete this selected shelf?`);
+
+				if (confirmation){
+					var shelf_id = shelf_list.val();
+					remove_shelf(shelf_id);
+				}
+			}
+		});
+
+		load_shelves();
+	})
+
+	function load_shelves(){
+		shelf_movies.html("");
+		shelf_list.html("");
+
+		$.get( '/movie_lists/load_shelves', function( data ) {
+			var shelf_data = new Array();
+
+			$.each(data, function(index, item){
+				shelf_data.push({id: item.id, text: item.name});
+			});
+
+			shelf_list.select2({
+				placeholder: "Select a shelf",
+				data: shelf_data
+			})
+			shelf_list.val(null).trigger("change");
+		});
+	}
+
+// ADD SHELF FUNCTIONS //
+	function add_shelf(){
+		var shelf_name = $("#new-shelf-name").val();
+		$("#new-shelf-name").val("");
+
+		var input = { shelf: { name: shelf_name } };
+
+		$("#spinner").show();
+
+		$.ajax({
+			type: "POST",
+			url: "/movie_lists",
+			data: input
+		}).done( function( data ) {
+			shelf_alert("alert-success", `Movie Shelf: ${data.name} successfully added!`, "add_alert");
+			load_shelves();
+		}).fail( function( data ) {
+			shelf_alert("alert-danger", data.responseJSON.errors, "add_alert");
+		}).always( function( data ){
+			$("#spinner").hide();
+		});
+	}
+
+	function shelf_alert(status, message, type){
+		if (type == "add_alert"){
+			var alert_tag = $("#add-shelf-alert");
+		} else if (type == "select_alert") {
+			var alert_tag = $("#select-alert");
+		} else if (type == "movies_alert") {
+			var alert_tag = $("#movies-alert")
+		}
+
+		var text =
+		`	<div class="alert ${status}" role="alert">
+		  	<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+		  	<div>${message}</div>
+			</div>`;
+
+		alert_tag.html(text);
+	}
+
+	//Deletes a shelf from the database
+	function remove_shelf(shelf_id){
+		$("#spinner").show();
+
+		$.ajax({
+			type: "DELETE",
+			url: `/movie_lists/${shelf_id}/`,
+		}).done( function( data ) {
+			shelf_alert("alert-success", data.message, "select_alert");
+		}).fail( function( data ) {
+			shelf_alert("alert-danger", data.responseJSON.errors, "select_alert");
+		}).always( function( data ) {
+			$("#spinner").hide();
+			load_shelves();
+			movie_add_button.addClass("disabled");
+			shelf_delete_button.addClass("disabled");
+			movies_in_shelf_panel.hide();
+			toggle_shelf_modal_tutorial(false);
+		});
+	}
+
+	//Loads the movies from the list via AJAX and populates them in the list
+	function get_shelf_movies(shelf_id){
+		shelf_movies.html('');
+
+		$("#spinner").show();
+		$.get( '/movie_lists/' + shelf_id + '/movies', function( data ) {
+			$.each(data, function(index, item){
+				append_loaded_movies(item);
+			});
+		}).always(function () {
+			$("#spinner").hide();
+		});
+	}
+
+	//Adds them to the Movies in Shelf list
+	function append_loaded_movies(movie){
+		var movie_item = `
+			<div class="movie-row row">
+				<div class="col-xs-6">
+					${movie.title}
+				</div>
+				<div class="col-xs-6">
+					<span id="remove-movie-button" data-toggle="tooltip" title="Removes movie from shelf" onclick="remove_movie_from_shelf(${movie.id}, '${movie.title}')" class="glyphicon glyphicon-trash"></span>
+					<a class="btn btn-default" id="view-movie-button" target="_blank" href="/movies/${movie.id}">View</a>
+				</div>
+			</div>`;
+		shelf_movies.append( movie_item );
+	}
+
+/* MOVIE FUNCTIONS */
+	$(function() {
+		shelf_modal_movie_multiple.select2({
+			theme: "bootstrap"
+		})
+
+		//Enables and disables "Add Movie Button" whether there are movies or not
+		shelf_modal_movie_multiple.on("change", function (evt) {
+			if (shelf_modal_movie_multiple.val() != null){
+				$("#shelf-modal-add").removeClass("disabled");
+			} else {
+				$("#shelf-modal-add").addClass("disabled");
+			}
+		});
+
+		//Clicking the "Add" button adds a movie to the shelf
+		$("#shelf-modal-add").click(function (){
+			if(!$(this).hasClass('disabled')){
+				add_movies_to_shelf();
+			}
+		});
+
+		movie_add_button.click(function (){
+			if(!$(this).hasClass('disabled')){
+				var shelf_id = shelf_list.val();
+
+				show_shelf_modal(shelf_id);
+			}
+		});
+	})
+
+	//Displays the modal with list of movies *not* in the current shelf
+	function show_shelf_modal(shelf_id){
+		shelf_modal_movie_multiple.html("");
+		shelf_modal_movie_multiple.val(null).trigger("change");
+
+		var modal_movies = $("#modal_movie_list")
+
+		$.get( '/movie_lists/' + shelf_id + '/not_shelved', function( data ) {
+			var movies = new Array();
+			$.each(data, function(index, item){
+				movies.push({id: item.id, text: item.title});
+			});
+
+			shelf_modal_movie_multiple.select2({
+				allowClear: true,
+				closeOnSelect: false,
+				data: movies
+			});
+		});
+
+		var shelf_title = shelf_list.children("option").filter(":selected").text();
+
+		$("#shelf-modal-title").html(`Add movies to ${shelf_title}`);
+		$("#shelf-modal").modal('toggle');
+	}
+
+	//Adds movies to specified shelf
+	function add_movies_to_shelf(){
+		var selected_movies = shelf_modal_movie_multiple.val();
+		var shelf_id = shelf_list.val();
+
+		var input = { shelf: { movies: selected_movies } };
+
+		$("#shelf-modal").modal('toggle');
+		$("#spinner").show();
+
+		$.ajax({
+			type: "POST",
+			url: `/movie_lists/${shelf_id}/add_movies`,
+			data: input
+		}).done( function( data ) {
+			shelf_alert("alert-success", data.message, "movies_alert");
+		}).fail( function( data ) {
+			shelf_alert("alert-danger", data.responseJSON.errors, "movies_alert");
+		}).always( function( data ) {
+			get_shelf_movies(shelf_id);
+		});
+
+		$("#spinner").hide();
+	}
+
+	//Removes movies from specified shelf
+	function remove_movie_from_shelf(movie_id, movie_title){
+		var confirmation = confirm(`Are you sure you want to remove ${movie_title} from the shelf?`);
+
+		if (!confirmation){
+			return
+		}
+
+		$("#spinner").show();
+		var shelf_id = shelf_list.val();
+
+		$.ajax({
+			type: "DELETE",
+			url: `/movie_lists/${shelf_id}/movies/${movie_id}`,
+		}).done( function( data ) {
+			shelf_alert("alert-success", data.message, "movies_alert");
+		}).fail( function( data ) {
+			shelf_alert("alert-danger", data.responseJSON.errors, "movies_alert");
+		}).always( function( data ) {
+			get_shelf_movies(shelf_id);
+		});
+
+		$("#spinner").show();
+	}
+
+	//TUTORIAL FUNCTIONS
+	function launch_tutorial(){
+		introJs().start();
+	}
+
+	introJs().onbeforechange(function(targetElement) {
+  	if (!targetElement){
+			introJS().nextStep() // go to the next step
+		} // if targetElement does not exist
+	});
+
+	var help_button = $("#help-button");
+
+	help_button.on("click", function() {
+		launch_tutorial();
+	})
+
+	function toggle_shelf_modal_tutorial(is_displayed){
+		if(is_displayed){
+			movies_in_shelf_panel.attr('data-intro', "Add or remove movies from the currently selected shelf in this panel. Clicking the 'Add Movie to Shelf Button' will open a new modal window with a multi select of movies not currently in the list.")
+		} else {
+			movies_in_shelf_panel.removeAttr("data-intro");
+		}
+	}
+</script>
