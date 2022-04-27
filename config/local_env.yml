@@ -7,4 +7,4 @@
 # GMAIL_USERNAME: 'Your_Gmail_Username'
 # makes 'Your_Gmail_Username' available as ENV["GMAIL_USERNAME"]
 
-WOLFRAM_API_KEY: "Q5PELA-K9RY46K994"
+WOLFRAM_API_KEY: ""
